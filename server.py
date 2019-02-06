@@ -1,5 +1,4 @@
 from flask import Flask, Request, Response
-from config import use_ssl
 
 class EndpointAction(object):
     def __init__(self):
@@ -34,7 +33,6 @@ class Server(Thread):
         self.bots = list()
 
     def on_home(self):
-        
         for b in self.bots:
             return "ACK"
 
