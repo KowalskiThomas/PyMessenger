@@ -1,5 +1,7 @@
+from classes import Message, QuickReply
 from bot import Bot
 from decorators import handler
+
 
 class Paybot(Bot):
     def __init__(self, access_token):
@@ -10,19 +12,30 @@ class Paybot(Bot):
         user = req.sender
         message = req.message
         print(message)
-        if message == "pay":
-            user.Send("How much?")
-            user.SetState("Pay")
+        user.Send(Message(
+            content = "What do you want to do?",
+            quick_replies=[
+                QuickReply("Pay", "SetState:PromptPay"),
+                QuickReply("Something else", "SetState:Home")
+            ]
+        ))
+        user.SetState("Pay")
 
     @handler(state = "Pay")
     def handler_pay(self, req):
         user = req.sender
         message = req.message
-        if message == "cancel":
-            user.Send("OK. Cancelling.")
-            user.SetState("Home")
-        else:
+        try:
             amount = float(message)
-            user.Send("Paying {}".format(amount))
-            user.SetState("Home")
+        except:
+            user.Send("Désolé, ce montant est invalide. Veuillez réessayer.")
 
+        user.Send("Envoi de {}".format(amount))
+        user.SetState("Home")
+
+
+    @handler(state = "PromptPay")
+    def handler_prompt_pay(self, req):
+        user = req.sender
+        user.Send("Combien voulez-vous payer?")
+        user.SetState("Pay")

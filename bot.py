@@ -1,3 +1,5 @@
+import json
+
 import requests
 
 from statesmanager import StatesManager
@@ -49,8 +51,22 @@ class Bot:
             self._auth_args = auth
         return self._auth_args
 
+    def process_payloads(self, entry):
+        p = entry.quick_reply_payload
+        if not p:
+            return
+
+        print(p)
+        if p.startswith("SetState:"):
+            state = p.split(":")[1]
+            print("Setting state to {}".format(state))
+            entry.sender.SetState(state)
+        else:
+            print("Unknown payload: {}".format(p))
+
     def on_request(self, data):
         data.sender = User(self, data.sender)
+        self.process_payloads(data)
         state = data.sender.State
 
         if state in self.handlers:
@@ -71,8 +87,12 @@ class Bot:
         }
         
         if message.content:
-            if not "message" in payload: payload["message"] = dict()
+            if "message" not in payload: payload["message"] = dict()
             payload["message"]["text"] = message.content
+
+        if message.quick_replies:
+            if "message" not in payload: payload["message"] = dict()
+            payload["message"]["quick_replies"] = [x.to_dict() for x in message.quick_replies]
 
         payload["notification_type"] = message.notification_type.value
 
@@ -83,6 +103,9 @@ class Bot:
         request_endpoint = '{0}/me/messages'.format(self.graph_url)
         response = requests.post(
             request_endpoint,
+            headers = {
+                "Authorization": "Bearer {}".format(self.access_token)
+            },
             params = self.auth_args,
             json = payload
         )

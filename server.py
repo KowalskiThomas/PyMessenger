@@ -6,8 +6,6 @@ from log import Log
 from parser import parse_raw_data
 
 VERIFY_TOKEN = "mliqlmskdlqmskdlmqsclmkqsnfhqzopkdqlmskqsfjhqsufqlksjklqzlkdjqlksjdlqksjdliqzjpodqs"
-ACCESS_TOKEN = "EAAExE9IwmSgBABZAsN9yCHd6zkBbusjootOK9tVz68kTZBjZC5hwSMmRqDCctvWuLqltZCnX7ZAQkG8AUpXmmYQF1p0ionuZCS4pVXuuUwdNtqAhojdNu62NTqmSTyjSS7KhGUFn5d0hlxLRpeQmT94N3fDH9AOZAeyiVRYlsnvem7A4kB0vins"
-SERVER_URL = "https://158.ip-51-75-252.eu:5000"
 
 
 class Server(Thread):
