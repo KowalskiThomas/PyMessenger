@@ -2,8 +2,8 @@ from bot import Bot
 from decorators import handler
 
 class Paybot(Bot):
-    def __init__(self):
-        Bot.__init__(self)
+    def __init__(self, access_token):
+        Bot.__init__(self, access_token)
 
     @handler(state = "Home", other_states = [None])
     def handler_home(self, req):
