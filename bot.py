@@ -1,10 +1,12 @@
-import copy
 import requests
 
 from statesmanager import StatesManager
 from server import Server
 from classes import NotificationType, ContentType, QuickReply, Message
 import utils
+
+DEFAULT_API_VERSION = 2.6
+
 
 class User:
     def __init__(self, bot, id):
@@ -21,7 +23,7 @@ class User:
     def Send(self, content):
         self.bot.send(self.id, content)
 
-DEFAULT_API_VERSION = 2.6
+
 class Bot:
     handlers = dict()
     states = StatesManager()
@@ -33,6 +35,7 @@ class Bot:
         self.app_secret = app_secret
         self.graph_url = 'https://graph.facebook.com/v{0}'.format(self.api_version)
         self.access_token = access_token
+        self._auth_args = None
 
     @property
     def auth_args(self):

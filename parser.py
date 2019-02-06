@@ -3,26 +3,27 @@ class Entry:
         self.page_id = page_id
         self.timestamp = timestamp
 
+
 class Attachment:
     def __init__(self):
         self.type = None
         self.url = None
 
     @staticmethod
-    def from_dict(d):
+    def from_dict(d: dict):
         x = Attachment()
         x.type = d["type"]
         x.url = d["payload"]["url"]
 
+
 class MessagingEntry:
     def __init__(self):
-        self.recipient = None
+        self.recipient:int = None
         self.sender = None
         self.timestamp = None
-        self.message = None
-        self.mid = None
-        self.text = None
-        self.quick_reply_payload = None
+        self.message: str = None
+        self.mid: str = None
+        self.quick_reply_payload: list = None
         self.attachments = None
 
     @staticmethod
@@ -37,6 +38,7 @@ class MessagingEntry:
         x.attachments = [Attachment.from_dict(y) for y in d.get("attachments", list())]
 
         return x
+
 
 def parse_raw_data(data):
     chunks = list()

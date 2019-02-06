@@ -9,6 +9,7 @@ VERIFY_TOKEN = "mliqlmskdlqmskdlmqsclmkqsnfhqzopkdqlmskqsfjhqsufqlksjklqzlkdjqlk
 ACCESS_TOKEN = "EAAExE9IwmSgBABZAsN9yCHd6zkBbusjootOK9tVz68kTZBjZC5hwSMmRqDCctvWuLqltZCnX7ZAQkG8AUpXmmYQF1p0ionuZCS4pVXuuUwdNtqAhojdNu62NTqmSTyjSS7KhGUFn5d0hlxLRpeQmT94N3fDH9AOZAeyiVRYlsnvem7A4kB0vins"
 SERVER_URL = "https://158.ip-51-75-252.eu:5000"
 
+
 class Server(Thread):
     app = None
     bots = list()
@@ -51,9 +52,8 @@ class Server(Thread):
                 "response": "Message processed."
             })
 
-    def verify_fb_token(self, token_sent):
-        #take token sent by facebook and verify it matches the verify token you sent
-        #if they match, allow the request, else return an error 
+    @staticmethod
+    def verify_fb_token(token_sent):
         if token_sent == VERIFY_TOKEN:
             return request.args.get("hub.challenge")
         
@@ -61,7 +61,6 @@ class Server(Thread):
             "status": 403,
             "message": "Invalid verify token."
         })
-
 
     def register_bot(self, bot):
         self.bots.append(bot)

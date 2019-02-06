@@ -11,9 +11,8 @@ try:
     b = Paybot(ACCESS_TOKEN)
     while True:
         time.sleep(1)
-    # while True:
-    #     req = input("Bot1>")
-    #     b.on_req(USER, req)
+except InterruptedError:
+    print()
 except KeyboardInterrupt:
     print()
 except EOFError:
