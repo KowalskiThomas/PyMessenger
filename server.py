@@ -35,8 +35,9 @@ class Server(Thread):
         else:
             data = request.get_json()
             try:
-                print(data)
-                return "{ok}"
+                data = parse_raw_data(data)
+                for b  in self.bots:
+                    b.on_request(data)
             except KeyError as e:
                 print("Exception while processing request.", e)
                 return json.dumps({

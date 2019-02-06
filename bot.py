@@ -27,7 +27,8 @@ class Bot:
     def __init__(self):
         pass
 
-    def on_req(self, user, req):
+    def on_request(self, data):
+        print(data)
         user = Bot.User(self, user)
         state = user.State
         if state in self.handlers:
