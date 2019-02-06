@@ -12,8 +12,7 @@ class Bot:
         def __init__(self, bot, id):
             self.id = id
             self.bot = bot
-            Bot.server.register_bot(self)
-
+ 
         def SetState(self, new_state):
             self.bot.states.SetState(self.id, new_state)
 
@@ -28,13 +27,11 @@ class Bot:
         Bot.server.register_bot(self)
 
     def on_request(self, data):
-        print(data)
-        return
-        user = Bot.User(self, user)
-        state = user.State
+        data.sender = Bot.User(self, data.sender)
+        state = data.sender.State
         if state in self.handlers:
             for f in self.handlers[state]:
-                f(self, user, req)
+                f(self, data)
         else:
             print("Unregistered state: {}".format(state))
 

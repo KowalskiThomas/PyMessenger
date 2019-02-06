@@ -6,18 +6,23 @@ class Paybot(Bot):
         Bot.__init__(self)
 
     @handler(state = "Home", other_states = [None])
-    def handler_home(self, user, req):
-        if req == "pay":
+    def handler_home(self, req):
+        user = req.sender
+        message = req.message
+        print(message)
+        if message == "pay":
             user.Send("How much?")
             user.SetState("Pay")
 
     @handler(state = "Pay")
-    def handler_pay(self, user, req):
-        if req == "cancel":
+    def handler_pay(self, req):
+        user = req.sender
+        message = req.message
+        if message == "cancel":
             user.Send("OK. Cancelling.")
             user.SetState("Home")
         else:
-            amount = float(req)
+            amount = float(message)
             user.Send("Paying {}".format(amount))
             user.SetState("Home")
 
