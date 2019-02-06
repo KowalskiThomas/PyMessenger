@@ -3,6 +3,7 @@ import json
 from flask import Flask, Request, Response, request
 
 from log import Log
+from parser import parse_raw_data
 
 VERIFY_TOKEN = "mliqlmskdlqmskdlmqsclmkqsnfhqzopkdqlmskqsfjhqsufqlksjklqzlkdjqlksjdlqksjdliqzjpodqs"
 ACCESS_TOKEN = "EAAExE9IwmSgBABZAsN9yCHd6zkBbusjootOK9tVz68kTZBjZC5hwSMmRqDCctvWuLqltZCnX7ZAQkG8AUpXmmYQF1p0ionuZCS4pVXuuUwdNtqAhojdNu62NTqmSTyjSS7KhGUFn5d0hlxLRpeQmT94N3fDH9AOZAeyiVRYlsnvem7A4kB0vins"
@@ -35,9 +36,9 @@ class Server(Thread):
         else:
             data = request.get_json()
             try:
-                data = parse_raw_data(data)
-                for b  in self.bots:
-                    b.on_request(data)
+                for chunk in parse_raw_data(data):
+                    for b in self.bots:
+                        b.on_request(chunk)
             except KeyError as e:
                 print("Exception while processing request.", e)
                 return json.dumps({
@@ -70,9 +71,9 @@ class Server(Thread):
             debug = False,
             host = "0.0.0.0",
             port = 5000,
-            # ssl_context = (
-            #     '/etc/letsencrypt/live/158.ip-51-75-252.eu/fullchain.pem', 
-            #     '/etc/letsencrypt/live/158.ip-51-75-252.eu/privkey.pem'
-            # )
+            ssl_context = (
+                '/etc/letsencrypt/live/158.ip-51-75-252.eu/fullchain.pem', 
+                '/etc/letsencrypt/live/158.ip-51-75-252.eu/privkey.pem'
+            )
         )
 

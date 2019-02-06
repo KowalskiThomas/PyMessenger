@@ -25,10 +25,11 @@ class Bot:
             self.bot.send(self.id, data)
 
     def __init__(self):
-        pass
+        Bot.server.register_bot(self)
 
     def on_request(self, data):
         print(data)
+        return
         user = Bot.User(self, user)
         state = user.State
         if state in self.handlers:
