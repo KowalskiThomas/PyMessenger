@@ -39,6 +39,9 @@ class Bot:
         self.access_token = access_token
         self._auth_args = None
 
+        self.always_typing_on = False
+        self.always_mark_seen = False
+
     @property
     def auth_args(self):
         if not hasattr(self, '_auth_args'):
@@ -84,6 +87,13 @@ class Bot:
 
     def on_request(self, data: MessagingEntry):
         data.sender = User(self, data.sender)
+
+        if self.always_typing_on:
+            self.typing_on(data.sender)
+
+        if self.always_mark_seen:
+            self.mark_seen(data.sender)
+
         self.process_payloads(data)
         state = data.sender.state
 
@@ -100,22 +110,64 @@ class Bot:
         
         assert(isinstance(message, Message))
 
-        payload = dict()
-        payload["recipient"] = {
-            "id": user_id
+        payload = {
+            "recipient": {
+               "id": user_id
+            },
+            "message": dict(),
+            "notification_type": message.notification_type.value,
+            "messaging_type": message.message_type
         }
         
         if message.content:
-            if "message" not in payload: payload["message"] = dict()
             payload["message"]["text"] = message.content
 
         if message.quick_replies:
-            if "message" not in payload: payload["message"] = dict()
             payload["message"]["quick_replies"] = [x.to_dict() for x in message.quick_replies]
 
-        payload["notification_type"] = message.notification_type.value
+        if message.metadata:
+            payload["message"]["metadata"] = message.metadata
+
+        if message.tag:
+            payload["tag"] = message.tag
 
         print(payload)
+        self.send_raw(payload)
+
+    def typing_on(self, user_id):
+        if isinstance(user_id, User):
+            user_id = user_id.id
+
+        payload = {
+            "recipient" : {
+                "id": user_id
+            },
+            "sender_action": "typing_on"
+        }
+        self.send_raw(payload)
+
+    def typing_off(self, user_id):
+        if isinstance(user_id, User):
+            user_id = user_id.id
+
+        payload = {
+            "recipient": {
+                "id": user_id
+            },
+            "sender_action": "typing_off"
+        }
+        self.send_raw(payload)
+
+    def mark_seen(self, user_id):
+        if isinstance(user_id, User):
+            user_id = user_id.id
+
+        payload = {
+            "recipient": {
+                "id": user_id
+            },
+            "sender_action": "mark_seen"
+        }
         self.send_raw(payload)
 
     def send_raw(self, payload):

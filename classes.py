@@ -14,6 +14,18 @@ class ContentType(Enum):
     email = "user_email"
 
 
+class MessagingTag(Enum):
+    BUSINESS_PRODUCTIVITY = "BUSINESS_PRODUCTIVITY"
+    COMMUNITY_ALERT = "COMMUNITY_ALERT"
+    # TODO https://developers.facebook.com/docs/messenger-platform/send-messages/message-tags
+
+
+class MessageType(Enum):
+    Response = "RESPONSE",
+    Update = "UPDATE",
+    Message = "MESSAGE_TAG"
+
+
 class Attachment:
     def __init__(self):
         self.type = None
@@ -95,8 +107,11 @@ class QuickReply:
 
 
 class Message:
-    def __init__(self, content, content_type = ContentType.text, notification_type = NotificationType.regular, quick_replies = None):
+    def __init__(self, content, content_type = ContentType.text, notification_type = NotificationType.regular, quick_replies = None, metadata = None, tag = None, message_type = MessageType.Response):
         self.content = content
         self.content_type = content_type
         self.notification_type = notification_type
         self.quick_replies = quick_replies
+        self.metadata = metadata
+        self.tag = tag
+        self.message_type = message_type
