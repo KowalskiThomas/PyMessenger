@@ -23,15 +23,33 @@ class Attachment:
         self.lat = None
         self.long = None
 
+        # For links
+        self.title = None
+
     @staticmethod
     def from_dict(d: dict):
         x = Attachment()
         x.type = d["type"]
-        x.url = d["payload"]["url"]
 
-        if x.type == "location":
-            x.lat = d["payload"]["coordinates"]["lat"]
-            x.long = d["payload"]["coordinates"]["long"]
+        if x.type == "fallback":
+            x.url = d["url"]
+            x.title = d["title"]
+        else:
+            x.url = d["payload"]["url"]
+            if x.type == "location":
+                x.lat = d["payload"]["coordinates"]["lat"]
+                x.long = d["payload"]["coordinates"]["long"]
+            elif x.type == "file" or x.type == "image" or x.type == "audio" or x.type == "video":
+                # Nothing to do, we already have the URL
+                pass
+
+        return x
+
+    def __repr__(self):
+        return "Attachment ({type}), URL = {url}".format(
+            type = self.type,
+            url = self.url
+        )
 
 
 class MessagingEntry:
@@ -55,7 +73,7 @@ class MessagingEntry:
         x.message = d["message"].get("text", "")
         x.mid = d["message"]["mid"]
         x.quick_reply_payload = d["message"].get("quick_reply", dict()).get("payload", None)
-        x.attachments = [Attachment.from_dict(y) for y in d.get("attachments", list())]
+        x.attachments = [Attachment.from_dict(y) for y in d["message"].get("attachments", list())]
 
         return x
 
