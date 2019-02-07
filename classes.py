@@ -19,11 +19,19 @@ class Attachment:
         self.type = None
         self.url = None
 
+        # For locations
+        self.lat = None
+        self.long = None
+
     @staticmethod
     def from_dict(d: dict):
         x = Attachment()
         x.type = d["type"]
         x.url = d["payload"]["url"]
+
+        if x.type == "location":
+            x.lat = d["payload"]["coordinates"]["lat"]
+            x.long = d["payload"]["coordinates"]["long"]
 
 
 class MessagingEntry:
@@ -39,11 +47,12 @@ class MessagingEntry:
 
     @staticmethod
     def from_dict(d):
+        print("ENTRY", d)
         x = MessagingEntry()
         x.sender = d["sender"]["id"]
         x.recipient = d["recipient"]["id"]
         x.timestamp = d["timestamp"]
-        x.message = d["message"]["text"]
+        x.message = d["message"].get("text", "")
         x.mid = d["message"]["mid"]
         x.quick_reply_payload = d["message"].get("quick_reply", dict()).get("payload", None)
         x.attachments = [Attachment.from_dict(y) for y in d.get("attachments", list())]

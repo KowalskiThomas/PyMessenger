@@ -1,11 +1,10 @@
-import json
 import inspect
 
 import requests
 
 from statesmanager import StatesManager
 from server import Server
-from classes import NotificationType, ContentType, QuickReply, Message
+from classes import NotificationType, ContentType, QuickReply, Message, MessagingEntry
 import utils
 
 DEFAULT_API_VERSION = 2.6
@@ -16,14 +15,14 @@ class User:
         self.id = id
         self.bot = bot
 
-    def SetState(self, new_state):
-        self.bot.states.SetState(self.id, new_state)
+    def set_state(self, new_state):
+        self.bot.states.set_state(self.id, new_state)
 
     @property
-    def State(self):
-        return self.bot.states.GetState(self.id)
+    def state(self):
+        return self.bot.states.get_state(self.id)
 
-    def Send(self, content):
+    def send(self, content):
         self.bot.send(self.id, content)
 
 
@@ -32,9 +31,9 @@ class Bot:
     states = StatesManager()
     server = Server()
 
-    def __init__(self, access_token, app_secret = None):
+    def __init__(self, access_token, app_secret = None, api_version = None):
         Bot.server.register_bot(self)
-        self.api_version = DEFAULT_API_VERSION # kwargs.get('api_version') or DEFAULT_API_VERSION
+        self.api_version = api_version if api_version else DEFAULT_API_VERSION
         self.app_secret = app_secret
         self.graph_url = 'https://graph.facebook.com/v{0}'.format(self.api_version)
         self.access_token = access_token
@@ -60,7 +59,7 @@ class Bot:
         if p.startswith("SetState:"):
             state = p.split(":")[1]
             print("Setting state to {}".format(state))
-            entry.sender.SetState(state)
+            entry.sender.set_state(state)
         elif p.startswith("Execute:"):
             f_name = p.split(":")[1]
             to_call = None
@@ -80,13 +79,13 @@ class Bot:
         else:
             print("Unknown payload: {}".format(p))
 
-    def process_payloads(self, entry):
+    def process_payloads(self, entry: MessagingEntry):
         self.process_quick_reply(entry)
 
-    def on_request(self, data):
+    def on_request(self, data: MessagingEntry):
         data.sender = User(self, data.sender)
         self.process_payloads(data)
-        state = data.sender.State
+        state = data.sender.state
 
         if data.continue_processing:
             if state in self.handlers:
@@ -95,7 +94,7 @@ class Bot:
             else:
                 print("Unregistered state: {}".format(state))
 
-    def send(self, user_id, message : Message):
+    def send(self, user_id, message: Message):
         if isinstance(message, str):
             message = Message(content = message)
         
@@ -132,5 +131,6 @@ class Bot:
         result = response.json()
         print(result)
         return result
+
 
 Bot.server.start()
