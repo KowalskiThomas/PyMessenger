@@ -21,8 +21,8 @@ class MessagingTag(Enum):
 
 
 class MessageType(Enum):
-    Response = "RESPONSE",
-    Update = "UPDATE",
+    Response = "RESPONSE"
+    Update = "UPDATE"
     Message = "MESSAGE_TAG"
 
 

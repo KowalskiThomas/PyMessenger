@@ -116,7 +116,7 @@ class Bot:
             },
             "message": dict(),
             "notification_type": message.notification_type.value,
-            "messaging_type": message.message_type
+            "messaging_type": message.message_type.value
         }
         
         if message.content:
