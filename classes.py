@@ -35,6 +35,7 @@ class MessagingEntry:
         self.mid: str = None
         self.quick_reply_payload = None
         self.attachments = None
+        self.continue_processing = True
 
     @staticmethod
     def from_dict(d):

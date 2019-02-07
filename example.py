@@ -15,7 +15,7 @@ class Paybot(Bot):
         user.Send(Message(
             content = "What do you want to do?",
             quick_replies=[
-                QuickReply("Pay", "SetState:PromptPay"),
+                QuickReply("Pay", "Execute:prompt_pay"),
                 QuickReply("Something else", "SetState:Home")
             ]
         ))
@@ -34,8 +34,8 @@ class Paybot(Bot):
         user.SetState("Home")
 
 
-    @handler(state = "PromptPay")
-    def handler_prompt_pay(self, req):
+    # @handler(state = "PromptPay")
+    def prompt_pay(self, req):
         user = req.sender
         user.Send("Combien voulez-vous payer?")
         user.SetState("Pay")

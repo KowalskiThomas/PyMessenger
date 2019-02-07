@@ -1,4 +1,5 @@
 import json
+import inspect
 
 import requests
 
@@ -51,29 +52,48 @@ class Bot:
             self._auth_args = auth
         return self._auth_args
 
-    def process_payloads(self, entry):
+    def process_quick_reply(self, entry):
         p = entry.quick_reply_payload
         if not p:
             return
 
-        print(p)
         if p.startswith("SetState:"):
             state = p.split(":")[1]
             print("Setting state to {}".format(state))
             entry.sender.SetState(state)
+        elif p.startswith("Execute:"):
+            f_name = p.split(":")[1]
+            to_call = None
+            available_functions = inspect.getmembers(self, predicate=inspect.ismethod)
+            for name, function in available_functions:
+                if name == f_name:
+                    to_call = function
+                    break
+
+            if to_call:
+                print("Executing function {}".format(f_name))
+                # Set continue_processing before calling the function so the user can change this behaviour
+                entry.continue_processing = False
+                to_call(entry)
+            else:
+                print("Couldn't find function to execute.")
         else:
             print("Unknown payload: {}".format(p))
+
+    def process_payloads(self, entry):
+        self.process_quick_reply(entry)
 
     def on_request(self, data):
         data.sender = User(self, data.sender)
         self.process_payloads(data)
         state = data.sender.State
 
-        if state in self.handlers:
-            for f in self.handlers[state]:
-                f(self, data)
-        else:
-            print("Unregistered state: {}".format(state))
+        if data.continue_processing:
+            if state in self.handlers:
+                for f in self.handlers[state]:
+                    f(self, data)
+            else:
+                print("Unregistered state: {}".format(state))
 
     def send(self, user_id, message : Message):
         if isinstance(message, str):
