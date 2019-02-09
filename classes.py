@@ -26,6 +26,35 @@ class MessageType(Enum):
     Message = "MESSAGE_TAG"
 
 
+class QuickReplyAction:
+    def __init__(self, s):
+        self.s = s
+
+    def __str__(self):
+        return "Custom:{}".format(self.s)
+
+
+class SetState(QuickReplyAction):
+    def __init__(self, new_state):
+        QuickReplyAction.__init__(self, None)
+        self.new_state = new_state
+
+    def __str__(self):
+        assert self.s is None
+        return "SetState:{}".format(self.new_state)
+
+
+class ExecuteFunction(QuickReplyAction):
+    def __init__(self, f):
+        QuickReplyAction.__init__(self, None)
+        self.f = f
+
+    def __str__(self):
+        print(dir(self.f))
+        assert self.s is None
+        return "Execute:{}".format(self.f.__name__)
+
+
 class Attachment:
     def __init__(self):
         self.type = None
@@ -91,11 +120,18 @@ class MessagingEntry:
 
 
 class QuickReply:
-    def __init__(self, title, payload, content_type = ContentType.text, image_url = None):
+    def __init__(self, title, action = None, payload = None, content_type = ContentType.text, image_url = None):
         self.title = title
         self.content_type = content_type
         self.image_url = image_url
-        self.payload = payload
+
+        if payload is not None:
+            self.payload = payload
+        elif action is not None:
+            assert isinstance(action, QuickReplyAction)
+            self.payload = str(action)
+        else:
+            self.payload = None
 
     def to_dict(self):
         return {

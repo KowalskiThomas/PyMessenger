@@ -1,4 +1,4 @@
-from classes import Message, QuickReply, ContentType
+from classes import Message, QuickReply, ContentType, SetState, ExecuteFunction
 from bot import Bot
 from decorators import handler
 
@@ -16,6 +16,9 @@ class Paybot(Bot):
         if not user.id in self.balances:
             self.balances[user.id] = 250
 
+        self.send_home_options(user)
+
+    def send_home_options(self, user):
         user.send(Message(
             content = "What do you want to do?",
             quick_replies=[
@@ -58,7 +61,7 @@ class Paybot(Bot):
         req.sender.send(Message(
             content = "Your options are:",
             quick_replies=[
-                QuickReply("Delete my account", "Execute:delete_account"),
+                QuickReply("Delete my account", action = ExecuteFunction(self.delete_action)),
                 QuickReply("Send my location", "", ContentType.location),
                 QuickReply("Go back", "SetState:Home")
             ]
@@ -68,3 +71,5 @@ class Paybot(Bot):
         del self.balances[req.sender.id]
         req.sender.send("Okay, we deleted it.")
         req.sender.set_state("Home")
+        self.send_home_options(req.sender)
+
