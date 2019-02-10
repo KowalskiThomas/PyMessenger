@@ -1,5 +1,6 @@
 from random import randint
 
+
 class FunctionRegistry:
     registry = dict()
     
@@ -11,7 +12,7 @@ class FunctionRegistry:
                 discrim = randint(1000, 9999)
             )
 
-            if not name in FunctionRegistry.registry:
+            if name not in FunctionRegistry.registry:
                 break
 
         return name
@@ -39,13 +40,16 @@ class FunctionRegistry:
     def get(ident, default = None):
         return FunctionRegistry.registry.get(ident, default)
 
+
 if __name__ == '__main__':
-    def plus(x, y):
-        return x + y
+    def plus(a, b):
+        return a + b
 
-    def times(x, y):
-        return x * y
+    def times(a, b):
+        return a * b
 
+
+    # noinspection PyMethodMayBeStatic
     class Test:
         def __init__(self, s):
             self.str = s

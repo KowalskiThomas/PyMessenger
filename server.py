@@ -1,7 +1,7 @@
 import sys
 from threading import Thread
 import json
-from flask import Flask, Request, Response, request
+from flask import Flask, request
 
 from log import Log
 from parser import parse_raw_data
@@ -9,6 +9,7 @@ from parser import parse_raw_data
 VERIFY_TOKEN = "mliqlmskdlqmskdlmqsclmkqsnfhqzopkdqlmskqsfjhqsufqlksjklqzlkdjqlksjdlqksjdliqzjpodqs"
 
 
+# noinspection PyMethodMayBeStatic
 class Server(Thread):
     app = None
     bots = list()
@@ -75,6 +76,6 @@ class Server(Thread):
                     '/etc/letsencrypt/live/158.ip-51-75-252.eu/privkey.pem'
                 )
             )
-        except PermissionError as e:
+        except PermissionError as _:
             print("!!!!!!!!!!!!!!!! Couldn't start internal web server.")
             sys.exit(1)

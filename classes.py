@@ -1,6 +1,7 @@
 from enum import Enum
 from function_registry import FunctionRegistry
 
+
 class NotificationType(Enum):
     regular = "REGULAR"
     silent_push = "SILENT_PUSH"
@@ -97,7 +98,7 @@ class Attachment:
 
 class MessagingEntry:
     def __init__(self):
-        self.recipient:int = None
+        self.recipient: int = None
         self.sender = None
         self.timestamp = None
         self.message: str = None

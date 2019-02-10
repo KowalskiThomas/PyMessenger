@@ -3,6 +3,7 @@ from bot import Bot, User
 from decorators import handler
 
 
+# noinspection PyMethodMayBeStatic
 class Paybot(Bot):
     def __init__(self, access_token):
         Bot.__init__(self, access_token)

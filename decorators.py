@@ -1,19 +1,19 @@
 from bot import Bot
 
+
 def handler(*args, **kwargs):
     if "other_states" in kwargs:
         states = kwargs["other_states"]
     else:
         states = list()
 
-    if not "state" in kwargs:
+    if "state" not in kwargs:
         raise Exception("A handler must provide a state parameter.")
     states.append(kwargs["state"])
 
-    
     def decorator(func):
         for state in states:
-            if not state in Bot.handlers:
+            if state not in Bot.handlers:
                 Bot.handlers[state] = list()
             
             Bot.handlers[state].append(func)

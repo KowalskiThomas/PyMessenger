@@ -1,10 +1,8 @@
-import inspect
-
 import requests
 
 from statesmanager import StatesManager
 from server import Server
-from classes import NotificationType, ContentType, QuickReply, Message, MessagingEntry
+from classes import Message, MessagingEntry  # NotificationType, ContentType, QuickReply
 from function_registry import FunctionRegistry
 import utils
 
@@ -12,8 +10,8 @@ DEFAULT_API_VERSION = 2.6
 
 
 class User:
-    def __init__(self, bot, id: int):
-        self.id: int = id
+    def __init__(self, bot, id_: int):
+        self.id: int = id_
         self.bot: Bot = bot
 
     def set_state(self, new_state: str):
@@ -27,6 +25,7 @@ class User:
         self.bot.send(self.id, content)
 
 
+# noinspection PyMethodMayBeStatic
 class Bot:
     handlers = dict()
     states = StatesManager()
@@ -147,7 +146,7 @@ class Bot:
             user_id = user_id.id
 
         payload = {
-            "recipient" : {
+            "recipient": {
                 "id": user_id
             },
             "sender_action": "typing_on"

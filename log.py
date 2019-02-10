@@ -1,5 +1,6 @@
 import datetime
 
+
 class Log:
     @staticmethod
     def get_datetime():

@@ -1,10 +1,11 @@
 import hashlib
 import hmac
 
+
 def validate_hub_signature(app_secret, request_payload, hub_signature_header):
     try:
         hash_method, hub_signature = hub_signature_header.split('=')
-    except:
+    except ValueError:
         pass
     else:
         digest_module = getattr(hashlib, hash_method)
@@ -12,6 +13,7 @@ def validate_hub_signature(app_secret, request_payload, hub_signature_header):
         generated_hash = hmac_object.hexdigest()
         if hub_signature == generated_hash:
             return True
+
     return False
 
 
