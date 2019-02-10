@@ -5,17 +5,18 @@ import requests
 from statesmanager import StatesManager
 from server import Server
 from classes import NotificationType, ContentType, QuickReply, Message, MessagingEntry
+from function_registry import FunctionRegistry
 import utils
 
 DEFAULT_API_VERSION = 2.6
 
 
 class User:
-    def __init__(self, bot, id):
-        self.id = id
-        self.bot = bot
+    def __init__(self, bot, id: int):
+        self.id: int = id
+        self.bot: Bot = bot
 
-    def set_state(self, new_state):
+    def set_state(self, new_state: str):
         self.bot.states.set_state(self.id, new_state)
 
     @property
@@ -54,7 +55,7 @@ class Bot:
             self._auth_args = auth
         return self._auth_args
 
-    def process_quick_reply(self, entry):
+    def process_quick_reply(self, entry: MessagingEntry):
         p = entry.quick_reply_payload
         if not p:
             return
@@ -64,29 +65,30 @@ class Bot:
             print("Setting state to {}".format(state))
             entry.sender.set_state(state)
         elif p.startswith("Execute:"):
-            f_name = p.split(":")[1]
-            to_call = None
-            available_functions = inspect.getmembers(self, predicate=inspect.ismethod)
-            for name, function in available_functions:
-                if name == f_name:
-                    to_call = function
-                    break
+            f_ident = p.split(":")[1]
+            to_call = FunctionRegistry.get(f_ident)
 
             if to_call:
-                print("Executing function {}".format(f_name))
+                print("Executing function {} ({})".format(to_call.__name__, f_ident))
                 # Set continue_processing before calling the function so the user can change this behaviour
                 entry.continue_processing = False
                 to_call(entry)
             else:
-                print("Couldn't find function to execute.")
+                print("Couldn't find function to execute in FunctionRegistry ({}).".format(f_ident))
         else:
-            print("Unknown payload: {}".format(p))
+            print("Unsupported payload: {}".format(p))
 
     def process_payloads(self, entry: MessagingEntry):
         self.process_quick_reply(entry)
 
+        if entry.continue_processing:
+            # ...
+            pass
+
     def on_request(self, data: MessagingEntry):
         data.sender = User(self, data.sender)
+
+        print("Message: {}".format(data.message))
 
         if self.always_typing_on:
             self.typing_on(data.sender)
@@ -95,14 +97,21 @@ class Bot:
             self.mark_seen(data.sender)
 
         self.process_payloads(data)
-        state = data.sender.state
 
-        if data.continue_processing:
+        # Handlers may change user's state and want to immediately call next state's handler
+        # That's why we make continue_processing False every time we call a handler, and if the next handler has to be
+        #        called, the called handler will have made continue_processing True.
+        while data.continue_processing:
+            state = data.sender.state
             if state in self.handlers:
                 for f in self.handlers[state]:
+                    print("Calling {}".format(f))
+                    data.continue_processing = False
                     f(self, data)
             else:
                 print("Unregistered state: {}".format(state))
+        else:
+            print("State handlers not processed (message already processed).")
 
     def send(self, user_id, message: Message):
         if isinstance(message, str):
@@ -131,7 +140,6 @@ class Bot:
         if message.tag:
             payload["tag"] = message.tag
 
-        print(payload)
         self.send_raw(payload)
 
     def typing_on(self, user_id):

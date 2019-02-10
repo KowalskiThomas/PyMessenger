@@ -32,8 +32,12 @@ class FunctionRegistry:
 
     @staticmethod
     def invoke(ident, *args):
-        f = FunctionRegistry.registry[ident]
+        f = FunctionRegistry.get(ident)
         return f(*args)
+
+    @staticmethod
+    def get(ident, default = None):
+        return FunctionRegistry.registry.get(ident, default)
 
 if __name__ == '__main__':
     def plus(x, y):

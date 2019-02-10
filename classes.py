@@ -1,5 +1,5 @@
 from enum import Enum
-
+from function_registry import FunctionRegistry
 
 class NotificationType(Enum):
     regular = "REGULAR"
@@ -47,12 +47,14 @@ class SetState(QuickReplyAction):
 class ExecuteFunction(QuickReplyAction):
     def __init__(self, f):
         QuickReplyAction.__init__(self, None)
-        self.f = f
+        self.function = f
+        self.ident = FunctionRegistry.register(f)
+        
+        assert self.ident is not None
 
     def __str__(self):
-        print(dir(self.f))
         assert self.s is None
-        return "Execute:{}".format(self.f.__name__)
+        return "Execute:{}".format(self.ident)
 
 
 class Attachment:
