@@ -71,6 +71,7 @@ class Server(Thread):
                 debug = False,
                 host = "0.0.0.0",
                 port = 5000,
+                threaded = True,
                 ssl_context = (
                     '/etc/letsencrypt/live/158.ip-51-75-252.eu/fullchain.pem', 
                     '/etc/letsencrypt/live/158.ip-51-75-252.eu/privkey.pem'

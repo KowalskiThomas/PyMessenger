@@ -104,7 +104,6 @@ class Bot:
             state = data.sender.state
             if state in self.handlers:
                 for f in self.handlers[state]:
-                    print("Calling {}".format(f))
                     data.continue_processing = False
                     f(self, data)
             else:
