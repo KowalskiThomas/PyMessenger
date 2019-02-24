@@ -2,7 +2,8 @@ import requests
 
 from statesmanager import StatesManager
 from server import Server
-from classes import Message, MessagingEntry  # NotificationType, ContentType, QuickReply
+# NotificationType, ContentType, QuickReply
+from classes import Message, MessagingEntry
 from function_registry import FunctionRegistry
 import utils
 
@@ -31,11 +32,12 @@ class Bot:
     states = StatesManager()
     server = Server()
 
-    def __init__(self, access_token, app_secret = None, api_version = None):
+    def __init__(self, access_token, app_secret=None, api_version=None):
         Bot.server.register_bot(self)
         self.api_version = api_version if api_version else DEFAULT_API_VERSION
         self.app_secret = app_secret
-        self.graph_url = 'https://graph.facebook.com/v{0}'.format(self.api_version)
+        self.graph_url = 'https://graph.facebook.com/v{0}'.format(
+            self.api_version)
         self.access_token = access_token
         self._auth_args = None
 
@@ -49,7 +51,8 @@ class Bot:
                 'access_token': self.access_token
             }
             if self.app_secret is not None:
-                appsecret_proof = utils.generate_appsecret_proof(self.access_token, self.app_secret)
+                appsecret_proof = utils.generate_appsecret_proof(
+                    self.access_token, self.app_secret)
                 auth['appsecret_proof'] = appsecret_proof
             self._auth_args = auth
         return self._auth_args
@@ -68,12 +71,16 @@ class Bot:
             to_call = FunctionRegistry.get(f_ident)
 
             if to_call:
-                print("Executing function {} ({})".format(to_call.__name__, f_ident))
-                # Set continue_processing before calling the function so the user can change this behaviour
+                print(
+                    "Executing function {} ({})".format(
+                        to_call.__name__, f_ident))
+                # Set continue_processing before calling the function so the
+                # user can change this behaviour
                 entry.continue_processing = False
                 to_call(entry)
             else:
-                print("Couldn't find function to execute in FunctionRegistry ({}).".format(f_ident))
+                print(
+                    "Couldn't find function to execute in FunctionRegistry ({}).".format(f_ident))
         else:
             print("Unsupported payload: {}".format(p))
 
@@ -99,7 +106,7 @@ class Bot:
 
         # Handlers may change user's state and want to immediately call next state's handler
         # That's why we make continue_processing False every time we call a handler, and if the next handler has to be
-        #        called, the called handler will have made continue_processing True.
+        # called, the called handler will have made continue_processing True.
         while data.continue_processing:
             state = data.sender.state
             if state in self.handlers:
@@ -113,24 +120,25 @@ class Bot:
 
     def send(self, user_id, message: Message):
         if isinstance(message, str):
-            message = Message(content = message)
-        
+            message = Message(content=message)
+
         assert(isinstance(message, Message))
 
         payload = {
             "recipient": {
-               "id": user_id
+                "id": user_id
             },
             "message": dict(),
             "notification_type": message.notification_type.value,
             "messaging_type": message.message_type.value
         }
-        
+
         if message.content:
             payload["message"]["text"] = message.content
 
         if message.quick_replies:
-            payload["message"]["quick_replies"] = [x.to_dict() for x in message.quick_replies]
+            payload["message"]["quick_replies"] = [x.to_dict()
+                                                   for x in message.quick_replies]
 
         if message.metadata:
             payload["message"]["metadata"] = message.metadata
@@ -180,11 +188,11 @@ class Bot:
         request_endpoint = '{0}/me/messages'.format(self.graph_url)
         response = requests.post(
             request_endpoint,
-            headers = {
+            headers={
                 "Authorization": "Bearer {}".format(self.access_token)
             },
-            params = self.auth_args,
-            json = payload
+            params=self.auth_args,
+            json=payload
         )
         result = response.json()
         print(result)

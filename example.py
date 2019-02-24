@@ -13,7 +13,7 @@ class Paybot(Bot):
         self.emails = dict()
         self.receivers = dict()
 
-    @handler(state = "Home", other_states = [None])
+    @handler(state="Home", other_states=[None])
     def handler_home(self, req: MessagingEntry):
         user = req.sender
 
@@ -24,17 +24,20 @@ class Paybot(Bot):
 
     def send_signup(self, user):
         user.send(Message(
-            content = "Welcome to PayBot! What's your email?",
+            content="Welcome to PayBot! What's your email?",
             quick_replies=[
-                QuickReply("", action=ExecuteFunction(self.save_email), content_type=ContentType.email)
+                QuickReply(
+                    "",
+                    action=ExecuteFunction(
+                        self.save_email),
+                    content_type=ContentType.email)
             ]
         ))
         user.set_state("WaitingEmail")
-        
 
     def send_home_options(self, user: User):
         user.send(Message(
-            content = "What do you want to do?",
+            content="What do you want to do?",
             quick_replies=[
                 QuickReply("Pay", ExecuteFunction(self.prompt_pay)),
                 QuickReply("Get balance", ExecuteFunction(self.send_balance)),
@@ -42,10 +45,10 @@ class Paybot(Bot):
             ]
         ))
 
-    @handler(state = "WaitingEmail")
-    def handler_custom_email(self, req:MessagingEntry):
+    @handler(state="WaitingEmail")
+    def handler_custom_email(self, req: MessagingEntry):
         req.sender.send(Message(
-            content = "Thanks for signing up! You just got $250!"
+            content="Thanks for signing up! You just got $250!"
         ))
 
         self.balances[req.sender.id] = 250.0
@@ -53,7 +56,7 @@ class Paybot(Bot):
         req.sender.set_state("Home")
         req.continue_processing = True
 
-    def save_email(self, req:MessagingEntry):
+    def save_email(self, req: MessagingEntry):
         email = req.quick_reply_payload
         req.message = email
         self.handler_custom_email(req)
@@ -63,8 +66,8 @@ class Paybot(Bot):
         user.send("Who do you want to pay?")
         user.set_state("WaitingReceiver")
 
-    @handler(state = "WaitingReceiver")
-    def handler_set_receiver(self, req:MessagingEntry):
+    @handler(state="WaitingReceiver")
+    def handler_set_receiver(self, req: MessagingEntry):
         user = req.sender
         message = req.message
 
@@ -78,7 +81,7 @@ class Paybot(Bot):
         user.send("How much do you want to send?")
         user.set_state("Paying")
 
-    @handler(state = "Paying")
+    @handler(state="Paying")
     def handler_pay(self, req: MessagingEntry):
         user = req.sender
         message = req.message
@@ -110,13 +113,19 @@ class Paybot(Bot):
         user.set_state("Home")
         req.continue_processing = True
 
-    @handler(state = "Advanced")
+    @handler(state="Advanced")
     def handler_advanced(self, req: MessagingEntry):
         req.sender.send(Message(
-            content = "Your options are:",
+            content="Your options are:",
             quick_replies=[
-                QuickReply("Delete my account", action = ExecuteFunction(self.delete_account)),
-                QuickReply("Send my location", payload = "", content_type = ContentType.location),
+                QuickReply(
+                    "Delete my account",
+                    action=ExecuteFunction(
+                        self.delete_account)),
+                QuickReply(
+                    "Send my location",
+                    payload="",
+                    content_type=ContentType.location),
                 QuickReply("Go back", SetState("Home"))
             ]
         ))

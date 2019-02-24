@@ -18,7 +18,8 @@ class ContentType(Enum):
 class MessagingTag(Enum):
     BUSINESS_PRODUCTIVITY = "BUSINESS_PRODUCTIVITY"
     COMMUNITY_ALERT = "COMMUNITY_ALERT"
-    # TODO https://developers.facebook.com/docs/messenger-platform/send-messages/message-tags
+    # TODO
+    # https://developers.facebook.com/docs/messenger-platform/send-messages/message-tags
 
 
 class MessageType(Enum):
@@ -50,7 +51,7 @@ class ExecuteFunction(QuickReplyAction):
         QuickReplyAction.__init__(self, None)
         self.function = f
         self.ident = FunctionRegistry.register(f)
-        
+
         assert self.ident is not None
 
     def __str__(self):
@@ -91,8 +92,8 @@ class Attachment:
 
     def __repr__(self):
         return "Attachment ({type}), URL = {url}".format(
-            type = self.type,
-            url = self.url
+            type=self.type,
+            url=self.url
         )
 
 
@@ -116,14 +117,19 @@ class MessagingEntry:
         x.timestamp = d["timestamp"]
         x.message = d["message"].get("text", "")
         x.mid = d["message"]["mid"]
-        x.quick_reply_payload = d["message"].get("quick_reply", dict()).get("payload", None)
-        x.attachments = [Attachment.from_dict(y) for y in d["message"].get("attachments", list())]
+        x.quick_reply_payload = d["message"].get(
+            "quick_reply", dict()).get(
+            "payload", None)
+        x.attachments = [
+            Attachment.from_dict(y) for y in d["message"].get(
+                "attachments", list())]
 
         return x
 
 
 class QuickReply:
-    def __init__(self, title, action = None, payload = None, content_type = ContentType.text, image_url = None):
+    def __init__(self, title, action=None, payload=None,
+                 content_type=ContentType.text, image_url=None):
         self.title = title
         self.content_type = content_type
         self.image_url = image_url
@@ -146,7 +152,8 @@ class QuickReply:
 
 
 class Message:
-    def __init__(self, content, content_type = ContentType.text, notification_type = NotificationType.regular, quick_replies = None, metadata = None, tag = None, message_type = MessageType.Response):
+    def __init__(self, content, content_type=ContentType.text, notification_type=NotificationType.regular,
+                 quick_replies=None, metadata=None, tag=None, message_type=MessageType.Response):
         self.content = content
         self.content_type = content_type
         self.notification_type = notification_type

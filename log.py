@@ -9,9 +9,9 @@ class Log:
     @staticmethod
     def print(level, message):
         print("[{time}] [{level}] {message}".format(
-            time = Log.get_datetime(),
-            level = level,
-            message = message
+            time=Log.get_datetime(),
+            level=level,
+            message=message
         ))
 
     @staticmethod

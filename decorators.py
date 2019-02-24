@@ -15,7 +15,7 @@ def handler(*args, **kwargs):
         for state in states:
             if state not in Bot.handlers:
                 Bot.handlers[state] = list()
-            
+
             Bot.handlers[state].append(func)
         print("Registering handler: {} for {}".format(func.__name__, kwargs))
 

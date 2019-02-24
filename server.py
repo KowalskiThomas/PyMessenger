@@ -15,14 +15,20 @@ class Server(Thread):
     bots = list()
 
     def __init__(self):
-        Thread.__init__(self, name = "MessengerBotServer")
+        Thread.__init__(self, name="MessengerBotServer")
         self.app = Flask("MessengerBotServer")
         self.daemon = True
         self.app.register_error_handler(500, self.handle_500)
-        self.app.add_url_rule("/", "Home", self.on_home, methods = ["GET", "POST"])
+        self.app.add_url_rule(
+            "/",
+            "Home",
+            self.on_home,
+            methods=[
+                "GET",
+                "POST"])
 
         self.bots = list()
-        
+
     def handle_500(self, error):
         return json.dumps({
             "status": 500,
@@ -56,7 +62,7 @@ class Server(Thread):
     def verify_fb_token(token_sent):
         if token_sent == VERIFY_TOKEN:
             return request.args.get("hub.challenge")
-        
+
         return json.dumps({
             "status": 403,
             "message": "Invalid verify token."
@@ -68,12 +74,12 @@ class Server(Thread):
     def run(self):
         try:
             self.app.run(
-                debug = False,
-                host = "0.0.0.0",
-                port = 5000,
-                threaded = True,
-                ssl_context = (
-                    '/etc/letsencrypt/live/158.ip-51-75-252.eu/fullchain.pem', 
+                debug=False,
+                host="0.0.0.0",
+                port=5000,
+                threaded=True,
+                ssl_context=(
+                    '/etc/letsencrypt/live/158.ip-51-75-252.eu/fullchain.pem',
                     '/etc/letsencrypt/live/158.ip-51-75-252.eu/privkey.pem'
                 )
             )
